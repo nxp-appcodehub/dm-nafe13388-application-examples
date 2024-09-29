@@ -1,0 +1,466 @@
+# NXP Application Code Hub
+[<img src="https://mcuxpresso.nxp.com/static/icon/nxp-logo-color.svg" width="100"/>](https://www.nxp.com)
+
+## NAFE13388-UIM (Analog Front End) Industrial Applications running on FRDM-MCXN947
+<p align="justify"> The NAFE13388 is a highly configurable industrial-grade multichannel universal input analog front-end (AFE) that meets high-precision measurement requirements. The device integrates low-leakage, high-voltage (HV) fast multiplexers, low-offset and low-drift programmable gain amplifier (PGA) and buffers, high data-rate 24-bit sigma-delta analog-to-digital converter (ADC), precise voltage and current excitation source, and low-drift voltage reference. All of the HV analog pins are diode-protected internally for electromagnetic compatibility (EMC) and miswiring scenarios. The NAFE13388 is equipped with various diagnostic and supplies supervisory circuitry for condition monitoring and anomaly detection. Two precise calibration voltage sources are made available for ease of end-to-end system self-calibration and predictive maintenance. </p>
+
+This codebase provides six applications of NAFE13388-UIM to test the different reading modes provided for Analog to Digital Conversion:
+<br /><ul><li><b>Current Sensing:</b> Reading a current across 220ohm shunt between AI4P-AI4N using Single Channel Single Reading conversion.<br /></li><li><b>Voltage Sensing:</b> Reading multiple voltages (Single Ended and Differential) on different Analog Inputs using Single Channel Single Reading conversion.</li><li><b>Voltage Sensing (MCMR):</b> Reading multiple voltages (Single Ended and Differential) on different Analog Inputs using Multi Channels Multi Readings conversion.</li><li><b>RTD 2 Wires:</b> Reading a voltage across an RTD Thermal Sensor excited by the internal VIEX, the conversion is performed using Single Channel Continuous Readings conversion.<br /></li> <li><b>RTD 4 Wires:</b> Reading a voltage across an RTD Thermal Sensor excited by the internal VIEX, the conversion is performed using Single Channel Continuous Readings conversion.<br /></li> <li><b>Weight Scale (Load Cell):</b> Calibrate procedure + Reading procedure of a load cell, the load cell excitation is generated thanks to the NAFE integrated VIEX, the conversion is performed using Single Channel Continuous Readings conversion<br /></li></ul>
+
+### NAFE13388 Block Diagram
+
+[<img src="./images/NAFE13388_Block_Diagram.PNG" width="700"/>](NAFE13388_Block_Diagram.PNG)
+
+### Key Features of NAFE13388-UIM (Analog Front End)
+
+- Eight configurable HV inputs
+    - Single-ended or differential, with ranges up to ±25 V
+    - Independent configurations for voltage, current, resistance, resistance temperature detector (RTD)
+    - Overvoltage protected up to ±36 V for less than
+- Programmable gain: x0.2 to x16
+- Fast data rates (7.5 SPS to 288 kSPS)
+- High accuracy
+- System calibration
+    - End-to-end calibration with integrated precise voltage sources
+    - Accurate factory-calibrated products available
+- ±3 ⁰C internal temperature sensor
+- Precise excitation voltage and current sources
+- Diagnostic system for faults detection and prediction
+- 32 MHz SPI interface
+- Power supply: HV: ±7 V to ±24 V, LV: 3.3 V
+- Robust 7.5 kV HBM ESD and IEC61000-4-5 2 kV surge protection
+
+### Key concepts related to NAFE13388-UIM (Analog Front End)
+
+- Some Common Terminologies Related to ADC:
+    - <p align="justify"><b>Sigma Delta ADC:</b> A Sigma-Delta ADC (Analog-to-Digital Converter) oversamples the input signal at a high frequency, filters noise using a modulator, and then decimates the signal to a lower frequency for accurate conversion. It provides high resolution and accuracy, ideal for low-frequency signals in precision applications like sensors and audio systems. </p>
+    - <p align="justify"><b>SINC Filter:</b> An ADC sinc filter is a low-pass digital filter commonly used in Sigma-Delta ADCs to remove high-frequency noise. It smooths the output by averaging, reducing quantization errors and providing a clean, accurate digital representation of the analog input. </p>
+    - <p align="justify"><b>Settling Mode:</b> In ADC settling mode, <b>normal settling </b> allows multiple conversions for the input to stabilize before providing a valid result, ensuring accuracy over time. <b>single-cycle settling</b> completes the conversion within one cycle, offering faster results but with potential for reduced accuracy if the input hasn’t fully stabilized. </p>
+    - <p align="justify"><b>ADC Data Rate:</b> ADC data rate refers to the speed at which an Analog-to-Digital Converter samples and converts an analog signal into digital output, typically measured in samples per second (SPS). A higher data rate allows faster signal processing but may reduce resolution or increase noise, impacting accuracy in some applications. </p>
+    - <p align="justify"><b>Programmable Channel Delay:</b> A Programmable channel delay in ADC systems allows users to set specific time delays between sampling different input channels. This feature helps synchronize data acquisition, manage timing differences, or compensate for signal delays in multi-channel systems, improving measurement accuracy and system flexibility in complex signal processing applications.</p>
+    - <p align="justify"><b>Programmable Gain Amplifiers:</b> Programmable Gain Amplifiers (PGAs) are amplifiers with adjustable gain settings, allowing users to control the amplification of input signals dynamically. PGAs improve signal resolution by amplifying weak signals before analog-to-digital conversion, making them ideal for applications requiring variable signal amplification, such as sensor interfacing and data acquisition systems.</p>
+    - <p align="justify"><b>V/I Excitation:</b> Voltage or current excitation refers to the external electrical stimulus applied to sensors or transducers for measurement. <b>Voltage excitation </b> provides a stable voltage source, while <b>current excitation </b> supplies a constant current. Both methods ensure accurate readings from resistive or active sensors in applications like strain gauges (load cell) and RTDs.</p>
+    - <p align="justify"> <b>Single Ended Signals:</b> A single ended input measures the voltage difference between a wire and the ground. This difference is then amplified to provide the output. Single ended inputs can suffer from noise as the wire that carries the signal picks up electrical background noise. The signal on a single ended input could also be subject to ground loops.</p>
+    - <p align="justify"><b>Differential Signals: </b>A differential input has no reference to ground. Rather, the differential input carries the signal on two wires, a (+) signal wire and a (-) signal wire. The output value is the difference between the signals on the two wires (common mode rejection). Notice the output eliminates the noise and the desired signal doubles. This is because the signal on the (+) wire will be the opposite of the signal on the (-) wire (because the signal on the (-) wire is being multiplied by -1). Therefore, by subtracting the (-) signal wire from the (+) signal wire, the desired signal doubles. </p>
+    - <p align="justify"><b>REFH and REFL:</b> REFH and REFL provide stable and accurate voltage sources derived from VREF_BYP. REFH and REFL are 92 % and 8 %, of VREF_BYP, with a nominal value of 2.3 V and 0.2 V, respectively. </p>
+
+- <b>Channel configuration registers:</b> CH_CONFIG0, CH_CONFIG1, CH_CONFIG2, and CH_CONFIG3.
+    - <b> CH_CONFIG0 (0x20h) </b>
+        - <p align="justify">Select input channel, either high voltage (HV_AIP/HV_AIN, HV_SEL=1) or low voltage (LVSIG_IN[2:0],HV_SEL = 0). </p>
+        - <p align="justify">Select one of the eight channel gains if high-voltage input is selected. (0.2x to 16x). </p>
+        - <p align="justify">Disable/Enable the channel temperature coefficients correction (TCC_OFF = 1). </p>
+    - <b> CH_CONFIG1 (0x21h) </b>
+        - <p align="justify">Set the pointer (CH_CAL_GAIN_OFFSET[3:0]) to select one of the 16 calibrated gain and offset coefficient pairs in the calibrated channel coefficient registers: GAIN_COEF0…15 and OFFSET_COEF0…15. </p>
+        - <p align="justify">Set the pointer (CH_THRS[3:0]) to select one of the 16 channel over- and under-range threshold pairs. </p>
+        - <p align="justify">Select one of 29 possible data rates: ADC_DATA_RATE[4:0]</p>
+        - Select one of the five possible filter options for second-stage SINC filter: ADC_SINC[2:0]
+    - <b> CH_CONFIG2 (0x22h) </b>
+        - <p align="justify">Select one of the 64 possible preset channel delays before ADC start conversion: CH_DELAY[5:0]. </p>
+        - <p align="justify">Select ADC Settling mode, single-cycle, or normal: ADC_NORMAL_ SETTLING. </p>
+        - <p align="justify">Select to reset ADC digital filters at the start of every ADC conversion: ADC_FILTER_RESET. </p>
+        - <p align="justify">Select to enable input channel level chopping with two ADC conversions (Precision mode): CH_CHOP = 1. </p>
+    - <b> CH_CONFIG3 (0x23h) </b>
+        - <p align="justify">Select excitation source: voltage or current (V/I).
+        - <p align="justify"> Select V/I polarity: positive or negative. </p>
+        - Excitation V/I source magnitude 4 bits. </p>
+        - <p align="justify"> Enable voltage source to direct route to HVMUX as one of the selectable inputs for ADC conversion. </p>
+        - <p align="justify">Enable 65 nA source current for open detection. </p>
+        - <p align="justify">Enable VIEX chopping with two conversions (see VIEX_CHOP section). </p>
+        - <p align="justify">Select one of the AIxP or AIxN pins for excitation V/I output. </p>
+
+- <b> NAFE13388 Reading (Conversion) Modes:</b>
+    - <p align="justify"><b>SCSR Conversion:</b> The Single-Channel Single-Reading (SCSR) conversion in the NAFE13388 involves configuring the device to acquire data from a single channel at a time, with only one reading per conversion cycle. It is useful for applications requiring precise measurements without continuous monitoring. This mode enhances control, minimizing resource use. </p>
+
+    - <p align="justify"><b>MCMR Conversion:</b> Multi-Channel Multi-Reading (MCMR) conversion in the NAFE13388 acquires data from multiple channels with multiple readings per channel in a single cycle. This is typically used in systems requiring multiple measurements across several channels in a single cycle for redundancy or averaging purposes. </p>
+
+    - <p align="justify"><b>SCCR Conversion:</b> Single Channel Continuous Reading (SCCR) conversion in the NAFE13388 involves continuous sampling from a single channel. This mode provides ongoing data acquisition, making it ideal for applications requiring constant monitoring of a sensor or signal, such as temperature or pressure measurements, where real-time data updates are essential. </p>
+
+    - <p align="justify"><b>MCSR Conversion:</b> Multi-Channel Single Reading (MCSR) conversion in the NAFE13388 allows sequential data acquisition from multiple channels, with each channel sampled once per conversion cycle. This method is useful in applications where different sensor inputs need to be read in turn, ensuring data from multiple sources are captured efficiently without continuous monitoring.</p>
+    
+    - <p align="justify"><b>MCCR Conversion: </b>Multi-Channel Continuous Reading (MCCR) conversion in the NAFE13388 continuously samples data from multiple channels simultaneously. It is ideal for applications that require real-time monitoring of several signals, such as multi-sensor systems, where each channel provides constant updates, allowing for comprehensive and simultaneous data acquisition across multiple inputs.</p>
+       
+#### Boards: FRDM-MCXN947, FRDM-MCXA153
+#### Categories: Sensor, Industrial
+#### Peripherals: DMA, GPIO, SENSOR, SPI, TIMER, UART
+#### Toolchains: MCUXpresso IDE
+
+## Table of Contents
+1. [Software](#software)
+2. [Hardware](#hardware)
+3. [Setup](#setup)
+4. [Applications Overview and Test Results](#applications-overview-and-test-results)<br>
+   4.1 [Voltage Sensing SCSR](#voltage-sensing-scsr)<br>
+   4.2 [Voltage Sensing MCMR](#voltage-sensing-mcmr)<br>
+   4.3 [Current Sensing SCSR](#current-sensing-scsr)<br>
+   4.4 [Two Wire RTD SCCR](#two-wire-rtd-sccr)<br>
+   4.5 [Four Wire RTD SCCR](#four-wire-rtd-sccr)<br>
+   4.6 [Weight Scale SCCR](#weight-scale-sccr)<br>
+5. [FAQs](#faqs) 
+6. [Support](#support)
+7. [Release Notes](#release-notes)
+
+## 1. Software<a name="software"></a>
+- [IoT Sensing SDK (ISSDK) v1.8](https://nxp.com/iot-sensing-sdk) offered as middleware in MCUXpresso SDK for supported platforms
+- [MCUXpresso IDE v11.9.0](https://www.nxp.com/design/design-center/software/development-software/mcuxpresso-software-and-tools-/mcuxpresso-integrated-development-environment-ide:MCUXpresso-IDE)
+
+## 2. Hardware<a name="hardware"></a>
+
+The needed Hardware are:
+* Power supply of 15V or 15V Adapter.
+* USB Cable.
+* Jumper Wires
+* FRDM-MCXN947 Base Board
+* NAFE13388-UIM Shield Board (*Analog Front End*)
+* 4 Wire RTD Sensor ( *RTD 2/4 Wires Applications*).
+* 220 ohm resistor (*Current Sensing Application*).
+* Load Cell (*Weight Scale Application*).
+* External Power Supply in order to try different voltage readings (*Voltage Sensing Application*).
+
+**Hardware Connections Details**
+
+- These are some hardware connections and details:
+
+- SGM3209YS8G/TR IC U20 (J90 1x2)
+The SGM3209 is a charge pump voltage converter which is used to generate a negative supply from a positive input.
+J90(1*2). It generates -15V when we apply +15V using External Voltage Source.
+
+    - JUMPER (default) = CLOSE
+    - OUTPUT pin of IC U20
+    - -15V
+
+- AICOM - J91 (CLOSED)
+
+- Analog Inputs: For analog inputs use Jumpers J82 and J83.
+
+- External Voltage Source -> J89 1-GND 2- +15 Volts
+
+**Note**: For ADC conversions: Connect Analog input pins AIxP/AIxN-AICOM connect positive end to the AIxP/AIxN of J82/J83 as required and negative end to GND/AIxN.
+
+- In order to completely understand all the applications in detail kindly go thorugh entire <b>README.md </b>
+- Refer these application notes for theoretical understanding of each applications.
+    - [AN14102](https://www.nxp.com/docs/en/application-note/AN14102.pdf) Industrial application measurements using NXP AFE.
+    - [AN14103](https://www.nxp.com/docs/en/application-note/AN14103.pdf) NAFE applications with MCUXpresso.
+
+
+## 3. Setup<a name="setup"></a>
+### 3.1 Step 1: Download and Install required Software(s)
+- Install MCUXpresso IDE 11.9.0
+- Download and Install [MCUXpresso SDK v2.14.0 for FRDM-MCXN947](https://mcuxpresso.nxp.com/en/builder?hw=FRDM-MCXN947). Make sure to select ISSDK  middleware while building SDK.
+- Download and Install [MCUXpresso SDK v2.14.2 for FRDM-MCXA153](https://mcuxpresso.nxp.com/en/builder?hw=FRDM-MCXA153). Make sure to select ISSDK  middleware while building SDK.
+- Install Git v2.39.0 (for cloning and running west commands).
+- Install Putty/Teraterm for UART.
+ 
+### 3.2 Step 2: Clone the APP-CODE-HUB/dm-nafe13388-application-examples
+- Clone this repository to get the example projects:
+- Change directory to cloned project folder:<br>
+    cd *dm-nafe13388-application-examples*
+ 
+**Note:** If you are using Windows to clone the project, then please configure filename length limit using below command
+**git config --system core.longpaths true**
+
+### 3.3 Step 3: Build example projects
+- Open MCUXpresso IDE and select a directory to create your workspace.
+- Install MCXUpresso SDK 2.14.x for FRDM-MCX947 (drag and drop SDK zip into "Installed SDK" view) into MCUXpresso IDE.
+- Go to "Quickstart Panel" and click on "Import Project(s) from file system".
+- Select "Project directory (unpacked)" and browse to the cloned project folder.
+- Select example projects that you want to open and run.
+- Right click on project and select build to start building the project.
+
+## 4. Applications Overview and Test Results<a name="applications-overview-and-test-results"></a>
+- User need to check COM port after connecting USB cable between Host PC and Target Board via device manager.
+
+[<img src="./images/device_manager.PNG" width="400"/>](device_manager.png)
+
+- Open PUTTY/Teraterm application installed on your Windows PC with Baudrate 115200 and assigned COM port as mentioned in above step.
+
+[<img src="./images/Putty_Serial_Terminal.PNG" width="400"/>](device_manager.png)
+
+- After right click on project and select "Debug As", Demo application will run in interactive mode. When the demo runs successfully, you can see the logs printed on the terminal.
+
+<h3><b> NAFE13388-UIM Applications </b></h3> 
+
+#### 4.1 Voltage Sensing SCSR <a name="voltage-sensing-scsr"></a>
+
+- <p align="justify">Voltage Sensing is performed for single ended as well as differential signals using single channel single reading conversion. </p>
+- <p align="justify"> Test Scenario: Single Ended (AIxP/AIxN-AICOM)/Differential (AIxP-AIxN) Voltage is applied using power supply on Analog Inputs and Analog Inputs sense these voltage levels and gives results after analog to digital conversion. </p>
+
+**Note:** Apply Voltage on Analog inputs keeping in mind HV input ranges supported by NAFE13388 IC by referring Electrical Characterestics Chapter of NAFE13388 Datasheet.
+
+- Connect Power Supply to Analog Inputs according to this:
+    - Logical Channel 0 is configured for AI1P-AICOM (Single-Ended Signal).
+    - Logical Channel 1 is configured for AI1N-AICOM (Single-Ended Signal).
+    - Logical Channel 2 is configured for AI2P-AICOM (Single-Ended Signal).
+    - Logical Channel 3 is again configured for AI1N-AICOM (Single-Ended Signal). 
+    - Logical Channel 4 is configured for AI3P-AICOM (Single-Ended Signal).
+    - Logical Channel 5 is configured for AI3N-AICOM (Single-Ended Signal).
+    - Logical Channel 6 is configured for AI4P-AI4N (Differential Signal).
+    
+    [<img src="./images/VoltageSensing_SCSR_1.PNG" width="700"/>](VoltageSensing_SCSR_1.PNG)
+
+- Apply Voltages in range according to the table below:
+
+     [<img src="./images/Voltage_Range_VS_MCMR_SCSR.PNG" width="700"/>](Voltage_Range_VS_MCMR_SCSR.PNG)
+
+- Single Ended Voltage Sensing:
+    - Connected AI1P-AICOM and AI2P-AICOM.
+
+    - Conversion Method Followed: Single Channel Single Reading Conversion.
+
+    - Applied +5 Volts on AI1P-AICOM and +2.03 Volts on AI2P-AICOM using Power Supply.
+
+        [<img src="./images/singleEnded_vs_scsr_mcmr_.jpg" width="700"/>](singleEnded_vs_scsr_mcmr_.jpg)
+
+        [<img src="./images/VoltageSensing_SCSR_2.PNG" width="700"/>](VoltageSensing_SCSR_2.PNG)
+
+- Differential Voltage Sensing:
+    - Connected AI4P-AI4N as shown in diagram
+
+    - Conversion Method Followed: Single Channel Single Reading Conversion.
+
+    - Applied +2.70 Volts on AI14P-AICOM and +2.53 Volts on AI4N-AICOM using Power Supply. Calculation is performed as follows: AI4P-AI4N = 2.70-2.53 which is equal to 0.17 Volts.
+
+        [<img src="./images/differential_vs_scsr_mcmr.jpg" width="700"/>](differential_vs_scsr_mcmr.jpg)
+
+        [<img src="./images/VoltageSensing_SCSR_3.PNG" width="700"/>](VoltageSensing_SCSR_2.PNG)
+
+#### 4.2 Voltage Sensing MCMR <a name="voltage-sensing-mcmr"></a>
+
+- <p align="justify">Voltage Sensing is performed for single ended as well as differential signals using multi channel multi reading conversion. </p>
+
+- <p align="justify"> Test Scenario: Single Ended (AIxP/AIxN-AICOM)/Differential (AIxP-AIxN) Voltage is applied using power supply on Analog Inputs and Analog Inputs sense these voltage levels and gives results after analog to digital conversion. </p>
+
+**Note:** Apply Voltage on Analog inputs keeping in mind HV input ranges supported by NAFE13388 IC by referring Electrical Characterestics Chapter of NAFE13388 Datasheet.
+
+- Connect Power Supply to Analog Inputs according to this:
+    - Logical Channel 0 is configured for AI1P-AICOM (Single-Ended Signal).
+    - Logical Channel 1 is configured for AI1N-AICOM (Single-Ended Signal).
+    - Logical Channel 2 is configured for AI2P-AICOM (Single-Ended Signal).
+    - Logical Channel 3 is again configured for AI1N-AICOM (Single-Ended Signal). 
+    - Logical Channel 4 is configured for AI3P-AICOM (Single-Ended Signal).
+    - Logical Channel 5 is configured for AI3N-AICOM (Single-Ended Signal).
+    - Logical Channel 6 is configured for AI4P-AI4N (Differential Signal).
+
+- Apply Voltages in range according to the table below:
+
+     [<img src="./images/Voltage_Range_VS_MCMR_SCSR.PNG" width="700"/>](Voltage_Range_VS_MCMR_SCSR.PNG)
+
+- Single Ended Voltage Sensing:
+    - Connected AI1P-AICOM and AI2P-AICOM.
+
+    - Conversion Method Followed: Multi Channel Multi Reading Conversion.
+
+    - Applied +5 Volts on AI1P-AICOM and +2.03 Volts on AI2P-AICOM using Power Supply.
+
+        [<img src="./images/singleEnded_vs_scsr_mcmr_.jpg" width="700"/>](singleEnded_vs_scsr_mcmr_.jpg)
+
+        [<img src="./images/VoltageSensing_MCMR_1.PNG" width="700"/>](VoltageSensing_MCMR_1.PNG)
+
+- Differential Voltage Sensing:
+    - Connected AI4P-AI4N as shown in diagram
+
+    - Conversion Method Followed: Multi Channel Multi Reading Conversion.
+
+    - Applied +2.70 Volts on AI14P-AICOM and +2.53 Volts on AI4N-AICOM using Power Supply. Calculation is performed as follows: AI4P-AI4N = 2.70-2.53 which is equal to 0.17 Volts.
+
+        [<img src="./images/differential_vs_scsr_mcmr.jpg" width="700"/>](differential_vs_scsr_mcmr.jpg)
+
+        [<img src="./images/VoltageSensing_MCMR_2.PNG" width="700"/>](VoltageSensing_MCMR_2.PNG)
+
+**Note:** MCMR is ideal for multi-channel applications where simultaneous monitoring of multiple signals is needed, abelit at the cost of complexity and potentially slower conversions while SCSR is more suited for single channel applications where speed and simplicity are prioritized.
+
+#### 4.3 Current Sensing SCSR <a name="current-sensing-scsr"></a>
+
+- <p align="justify"> Current sensing in the NAFE13388 works by using a small, precise resistor to measure how much current is flowing in a system. It converts the current into a voltage that the device can read. This method is accurate, reduces noise, and is commonly used for monitoring things like pressure in industrial systems. </p>
+
+- <p align="justify"> The NAFE13388 measures pressure using a pressure transmitter that converts pressure into a standard current signal, typically ranging from 4 mA to 20 mA. For example, 4 mA might represent 0 pressure, and 20 mA could represent maximum pressure (like 10 bars). The device reads the current through a precise resistor, converts it to a voltage, and then calculates the corresponding pressure based on the current value. This allows the system to accurately track changes in pressure. </p>
+
+- Provide Voltage to Analog Input AI4P-AI4N using Power Supply.
+- Connect Resistance in series with voltage on AI4P-AI4N to measure current across AI4P-AI4N.
+- Refer this table to set voltage and corresponding gains based on resistances used:
+     
+    [<img src="./images/Current_Resistance_Table.PNG" width="700"/>](Current_Resistance_Table.PNG)
+
+- Conversion Method Followed: Single Channel Single Reading Conversion.
+- Connected Voltage of +3 Volts using Power Supply and also a resistance of 220 ohms in series with it to measure current across AI4P-AI4N which came out to be 0.014A which can be seen on power supply output.
+
+    [<img src="./images/CurrentSensing.jpg" width="700"/>](CurrentSensing.jpg)
+
+- Output Current as calculated via SensedVoltage/Resistance is shown below:
+
+    [<img src="./images/CurrentSensing_SCSR.PNG" width="700"/>](CurrentSensing_SCSR.PNG)
+
+#### 4.4 Two Wire RTD SCCR <a name="two-wire-rtd-sccr"></a>
+
+- Reading Voltage Across Two Wire RTD powered by NAFE13388 VIEX using Single Channel Continuous Reading Conversion.
+- RTD Stands for Resistance Temperature Detectors.
+- <p align="justify"> A 2-wire RTD (Resistance Temperature Detector) measures temperature by passing a current through a resistor that changes resistance with temperature. The voltage across the RTD is measured to calculate the resistance. In this simple setup, wire resistance can affect accuracy, making it best for short distances. </p>
+- <p align="justify"> The main drawback of a 2-wire RTD is reduced accuracy due to added resistance from the wires, affecting measurements. </p>
+
+- <p align="justify"> For more information about RTDs refer this application note which covers all the theoretical and conceptual details about 2/3/4 wire RTDs: </p>
+
+    [AN14127](https://www.nxp.com/docs/en/application-note/AN14127.pdf) RTD measurement system with NAFE13388/73388 family of devices.
+
+- Connections Guide for two wire RTD:
+    
+    [<img src="./images/two_wire_RTD_shared_Exc_Source.PNG" width="700"/>](two_wire_RTD_shared_Exc_Source.PNG)
+	
+    
+- Provide 750uA current using NAFE13388 VIEX to AI1P.
+- Connect AI1P-AICOM as follows:
+    - Red wire of 2-Wire RTD to AI1P which is Force the current of 750uA and sense the voltage as well.
+    - White Wire of 2-Wire RTd to AICOM as a current return path.
+- <p align="justify"> Measure current across AI1P-AICOM by connecting any wire or resistance on AI1P, Place red probe of multimeter on AI1P wire on which wire/resistance is connected and black probe to AICOM which is J91 on NAFE13388. </p>
+- In our case, current came out to be 765.5uA as shown in figure below, replace Isource with the value you will get at your end for accurate readings.
+
+    [<img src="./images/Isource.jpg" width="700"/>](Isource.jpg)
+
+    [<img src="./images/Isource_2wire_rtd_code.PNG" width="700"/>](Isource_2wire_rtd_code.PNG)
+- We can use 4 wire RTD to calulate temperature for 2 wire RTD as well, Connect any red wire to AI1P and any white wire to AICOM as shown below:
+
+    - Readings and connections at room temperature:
+
+        [<img src="./images/2wireRTD_withoutWater.jpg" width="700"/>](2wireRTD_withoutWater.jpg)
+
+        [<img src="./images/two_wire_rtd_without_water.PNG" width="700"/>](two_wire_rtd_without_water.PNG)
+
+    - Readings and connections when dipped in cold water:
+
+        [<img src="./images/2wireRTD_withWater.jpg" width="700"/>](2wireRTD_withWater.jpg)
+
+        [<img src="./images/two_wire_rtd_with_water.PNG" width="700"/>](two_wire_rtd_with_water.PNG)
+
+- **Note:** A 3-wire RTD is better than a 2-wire RTD because it compensates for the resistance of the connecting wires, improving measurement accuracy by canceling out the effects of lead wire resistance, especially in longer distances.
+
+- **Note**: Since the NAFE13388 silicon doesn't provide the support to excite two analog inputs pins from single excitation pin as needed so we will not show the use case of three wire RTDs and directly proceed with four wire RTDs.
+#### 4.5 Four Wire RTD SCCR <a name="four-wire-rtd-sccr"></a>
+
+
+- Reading Voltage Across Four Wire RTD powered by NAFE13388 VIEX using Single Channel Continuous Reading Conversion.
+
+- <p align="justify"> Four-wire RTDs are the most accurate because they completely eliminate the effects of lead wire resistance. In this setup, two wires supply current while the other two measure the voltage across the RTD, with no current flowing through the measurement wires. This setup provides highly precise temperature readings, ideal for critical applications. </p>
+ 
+
+- <p align="justify"> Force 750uA current on AI2P-AICOM which becomes the force path to make 4 wire RTD work and Sense the voltage after ADC conversion across AI1P-AI1N using differential sensing mechanism. </p>
+
+- <p align="justify"> For more information about RTDs refer this application note which covers all the theoretical and conceptual details about 2/3/4 wire RTDs: </p>
+    
+    [AN14127](https://www.nxp.com/docs/en/application-note/AN14127.pdf) RTD measurement system with NAFE13388/73388 family of devices.
+
+- Connections Guide for four wire RTD:
+
+    [<img src="./images/four_wire_rtd_connection_diag.PNG" width="700"/>](four_wire_rtd_connection_diag.PNG)
+
+- Provide 750uA current using NAFE13388 VIEX to AI2P-AICOM.
+- Connect One Red wire of RTD to AI2P and One White Wire to AICOM which completes the current forcing path required to force 750uA current to RTD.
+- Connect Other Red wire of RTD to AI1P and other White wire to AI1N which is the differential voltage sensing path which is then used to calculate temperature according to the conversion formulae.
+- <p align="justify"> Measure current across AI2P-AICOM by connecting any wire or resistance on AI1P, Place red probe of multimeter on AI2P wire on which wire/resistance is connected and black probe to AICOM which is J91 on NAFE13388. </p>
+- In our case, current came out to be 765.5uA as shown in figure below, replace Isource with the value you will get at your end for accurate readings.
+
+    [<img src="./images/Isource.jpg" width="700"/>](Isource.jpg)
+
+    [<img src="./images/Isource_4wire_rtd_code.PNG" width="700"/>](Isource_4wire_rtd_code.PNG)
+- Connections and Results are as follows:
+
+    - Readings and connections at room temperature:
+
+        [<img src="./images/4wireRTD_wihoutWater.jpg" width="700"/>](4wireRTD_wihoutWater.jpg)
+
+        [<img src="./images/Four_wire_rtd_without_water.PNG" width="700"/>](Four_wire_rtd_without_water.PNG)
+
+    - Readings and connections when dipped in cold water:
+
+         [<img src="./images/4wireRTD_withWater.jpg" width="700"/>](2wireRTD_withWater.jpg)
+
+         [<img src="./images/Four_wire_rtd_with_water.PNG" width="700"/>](Four_wire_rtd_with_water.PNG)
+        
+- **Note:** A 4-wire RTD is better because it eliminates the influence of lead wire resistance, providing more accurate temperature measurements. The difference of around 3°C between 2-wire and 4-wire RTDs arises because the 2-wire setup includes lead resistance in the measurement, causing higher temperature errors.
+    
+#### 4.6 Weight Scale SCCR <a name="weight-scale-sccr"></a>
+
+- <p align="justify">  <b> Weight Cell (Load Cell): </b> Calibrate procedure + Reading procedure of a load cell, the load cell excitation is generated thanks to the NAFE integrated VIEX, the conversion is performed using Single Channel Continuous Readings conversion </p>
+
+- <p align="justify">A load cell is a transductor used to translate mechanical force, such as weight, into measurable quantity. Load cells are usually composed of a strain gauge positioned on an elastic element. The elastic element is usually made of steel, so it is strong, but also has some elasticity. The minute variations on the spring element can be detected with strain gauges. The strain of the strain gauge is then converted by the electronics (ADC + excitation circuit) to determine the weight. </p>
+
+- <p align="justify"> In a load cell, a Wheatstone bridge structure is used to transform a resistance value to a voltage value. The Wheatstone architecture utilizes a strain gauge in place of resistors. AI2P of the NAFE is used as output voltage, while AI1P and AI1N are used to sense the voltage across the bridge. </p>
+
+     [<img src="./images/loadCell_wheatstoneBridge.PNG" width="700"/>](loadCell_wheatstoneBridge.PNG)
+
+- <p align="justify"> This application needs a voltage excitation source and two input channels to sense the voltage. Use a slow data rate and a higher gain configuration to improve the quality of reading as the sense voltage range will be in the order of mV. </p>
+
+- Connections Guide for weighing scale:
+
+    - <p align="justify"> Connect Red and Black wires of the load cell to AI2P and AICOM respectively for forcing 6 Volts excitation Voltage to AI2P. </p>
+    - <p align="justify"> Connect AI1P-AI1N with green and white wires respectively to sense differential voltage acrross which is required for weight calculation. </p>
+
+- <p align="justify"> Need of 6 volts Excitation Voltage: A 6-volt voltage excitation is required for a load cell to provide a stable and consistent voltage to the strain gauges. This excitation voltage powers the strain gauges and ensures that any changes in their resistance due to applied force result in measurable voltage changes. Higher excitation voltage, like 6 volts, improves the signal-to-noise ratio, enhancing the accuracy and resolution of the weight measurement. It also ensures the strain gauges operate within their optimal range for precise and reliable performance. </p>
+
+- Three Process to Calibrate and Measure Weight of any Object:
+   
+    1. Offset Calculation: Sense the voltage across load cell without putting any weight first, resulting voltage should be stored as offset.
+    2. Calibration Coefficient Calculation: Calibrate the load cell with known weight and store the value of calibration coefficient as follows:
+
+        - calibrationCoeff = (knownWeight)/(ConversionResult-Offset)
+    3. Now any weight can be measured, given the voltage conversion read by the ADC (Vadc):
+        
+        - Weight = calibrationCoeff * (Vadc - Offset)
+
+- Step 1: Offset Calculation(No Weight):
+
+    [<img src="./images/WeightScale_1.PNG" width="700"/>](WeightScale_1.PNG)
+
+    [<img src="./images/loadCellWithoutWeight.jpg" width="700"/>](loadCellWithoutWeight.jpg)
+
+- Step 2: Calculation of Calibration Coefficient by calibration weight scale with known Weight(303g in this case):
+
+    [<img src="./images/WeightScale_2.PNG" width="700"/>](WeightScale_2.PNG)
+
+    [<img src="./images/mugWeightScale_actualWeight.jpg" width="700"/>](mugWeightScale_actualWeight.jpg)
+
+    [<img src="./images/mugWeightScale_LoadCell.jpg" width="700"/>]( mugWeightScale_LoadCell.jpg)
+
+- Step 3: Actual Weights Calculation(289g in this case):
+
+    [<img src="./images/bottleWeightScale_actualWeight.jpg" width="700"/>]( bottleWeightScale_actualWeight.jpg)
+
+    [<img src="./images/WeightScale_3.PNG" width="700"/>](WeightScale_3.PNG)
+
+## 5. FAQs<a name="faqs)"></a>
+No FAQs have been identified for this project.
+
+## 6. Support<a name="support"></a>
+* [NAFEx3388 Highly Configurable 8 Channel �25 V Universal Input Analog Front-End with Excitation Sources](https://www.nxp.com/products/analog-and-mixed-signal/analog-front-end/highly-configurable-8-channel-25-v-universal-input-analog-front-end-with-excitation-sources:NAFEx3388)
+
+#### Project Metadata
+
+<!----- Boards ----->
+[![Board badge](https://img.shields.io/badge/Board-FRDM&ndash;MCXN947-blue)]()
+[![Board badge](https://img.shields.io/badge/Board-FRDM&ndash;MCXA153-blue)]()
+
+<!----- Categories ----->
+[![Category badge](https://img.shields.io/badge/Category-SENSOR-yellowgreen)](https://github.com/search?q=org%3Anxp-appcodehub+sensor+in%3Areadme&type=Repositories)
+[![Category badge](https://img.shields.io/badge/Category-INDUSTRIAL-yellowgreen)](https://github.com/search?q=org%3Anxp-appcodehub+industrial+in%3Areadme&type=Repositories)
+
+<!----- Peripherals ----->
+[![Peripheral badge](https://img.shields.io/badge/Peripheral-DMA-yellow)](https://github.com/search?q=org%3Anxp-appcodehub+dma+in%3Areadme&type=Repositories)
+[![Peripheral badge](https://img.shields.io/badge/Peripheral-GPIO-yellow)](https://github.com/search?q=org%3Anxp-appcodehub+gpio+in%3Areadme&type=Repositories)
+[![Peripheral badge](https://img.shields.io/badge/Peripheral-SENSOR-yellow)](https://github.com/search?q=org%3Anxp-appcodehub+sensor+in%3Areadme&type=Repositories)
+[![Peripheral badge](https://img.shields.io/badge/Peripheral-SPI-yellow)](https://github.com/search?q=org%3Anxp-appcodehub+spi+in%3Areadme&type=Repositories)
+[![Peripheral badge](https://img.shields.io/badge/Peripheral-TIMER-yellow)](https://github.com/search?q=org%3Anxp-appcodehub+timer+in%3Areadme&type=Repositories)
+[![Peripheral badge](https://img.shields.io/badge/Peripheral-UART-yellow)](https://github.com/search?q=org%3Anxp-appcodehub+uart+in%3Areadme&type=Repositories)
+
+<!----- Toolchains ----->
+[![Toolchain badge](https://img.shields.io/badge/Toolchain-MCUXPRESSO%20IDE-orange)](https://github.com/search?q=org%3Anxp-appcodehub+mcux+in%3Areadme&type=Repositories)
+
+Questions regarding the content/correctness of this example can be entered as Issues within this GitHub repository.
+
+>**Note**: For more general technical questions regarding NXP Microcontrollers and the difference in expected functionality, enter your questions on the [NXP Community Forum](https://community.nxp.com/)
+
+[![Follow us on Youtube](https://img.shields.io/badge/Youtube-Follow%20us%20on%20Youtube-red.svg)](https://www.youtube.com/NXP_Semiconductors)
+[![Follow us on LinkedIn](https://img.shields.io/badge/LinkedIn-Follow%20us%20on%20LinkedIn-blue.svg)](https://www.linkedin.com/company/nxp-semiconductors)
+[![Follow us on Facebook](https://img.shields.io/badge/Facebook-Follow%20us%20on%20Facebook-blue.svg)](https://www.facebook.com/nxpsemi/)
+[![Follow us on Twitter](https://img.shields.io/badge/X-Follow%20us%20on%20X-black.svg)](https://x.com/NXP)
+
+## 7. Release Notes<a name="release-notes"></a>
+| Version | Description / Update                           | Date                        |
+|:-------:|------------------------------------------------|----------------------------:|
+| 1.0     | Initial release on Application Code Hub        | September 28<sup>th</sup> 2024 |
