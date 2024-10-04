@@ -1,6 +1,5 @@
 /*
- * Copyright 2016-2024 NXP
- * All rights reserved.
+ * Copyright 2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,6 +15,7 @@
 #include "clock_config.h"
 #include "MCXN947_cm33_core0.h"
 #include "fsl_debug_console.h"
+#include "systick_utils.h"
 #include "NAFE113x8_SDK.h"
 /* TODO: insert other include files here. */
 
@@ -33,6 +33,7 @@ int main(void) {
     /* Init board hardware. */
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
+    BOARD_SystickEnable();
     BOARD_InitBootPeripherals();
 #ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
     /* Init FSL debug console. */
@@ -230,9 +231,6 @@ static void VSenseMCMR() {
 		NAFE113x8_WriteField(&ChConfig2_AdcFilterRst,0,0);
 		NAFE113x8_WriteField(&ChConfig2_ChChop,0,0);
 
-		NAFE113x8_WriteRegister(&ChConfig4,0,0x7F);
-		NAFE113x8_doMCMR(0);
-
 		PRINTF("\r\nConnections for Each Logical Channel\r\n");
 		PRINTF("\r\n****************\r\n");
 		PRINTF("\r\n 0 - AI1P-AICOM \r\n");
@@ -244,15 +242,16 @@ static void VSenseMCMR() {
 		PRINTF("\r\n 6 - AI4P-AI4N \r\n");
 		PRINTF("\r\n****************\r\n");
 
-
- 		PRINTF("\r\nPress any key to start conversion\r\n");
+		PRINTF("\r\nPress any key to start conversion\r\n");
 		GETCHAR();
+
+		NAFE113x8_WriteRegister(&ChConfig4,0,0x7F);
+		NAFE113x8_doMCMR(0);
+		delay(100);
 
 		PRINTF("\033[0;32m");
 		PRINTF("\r\nCh0\t\tCh1\t\tCh2\t\tCh3\t\tCh4\t\tCh5\t\tCh6 \r\n");
 		PRINTF("\033[0m");
-		delay(100);
-
 		conversionResult = NAFE113x8_VoltageTranslation(NAFE113x8_getSample(0),HV,0,0.2);
 		PRINTF("%f\t",conversionResult);
 		conversionResult = NAFE113x8_VoltageTranslation(NAFE113x8_getSample(1),HV,0,0.4);

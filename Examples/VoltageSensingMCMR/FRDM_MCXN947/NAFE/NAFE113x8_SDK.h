@@ -1,11 +1,8 @@
 /*
+ * NAFE113x8_SDK.h
  * Copyright 2024 NXP
- * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
- */
-/*
- *file NAFE113x8_SDK.h
  */
 
 #ifndef NAFE113X8_SDK_H_
@@ -17,6 +14,9 @@
 #include "fsl_lpspi.h"
 #include "fsl_gpio.h"
 #include "NAFE113x8_Register.h"
+
+#define SUCCESS 0
+#define TIMEOUT 1
 
 #define NAFE113x8_SPI_READ_FORMAT_BYTE0(DEVID,ADDRESS)  (DEVID << 7) | (1<<6) | (ADDRESS>>7)
 #define NAFE113x8_SPI_READ_FORMAT_BYTE1(ADDRESS)        (ADDRESS & 0x7F)<<1
@@ -43,9 +43,9 @@ void NAFE113x8_selectChannel(uint8_t channel, bool devID);
 void NAFE113x8_WriteField(const Field_t *FieldDef, bool devID, uint16_t fieldValue);
 void NAFE113x8_ReadField(const Field_t *FieldDef, bool devID, uint16_t *fieldValue);
 
-void NAFE113x8_doSCCR(uint8_t channel, bool devID, uint16_t count);
+uint8_t NAFE113x8_doSCCR(uint8_t channel, bool devID, uint16_t count);
 void NAFE113x8_doMCMR(bool devID);
-void NAFE113x8_doMCCR(bool devID, uint16_t count);
+uint8_t NAFE113x8_doMCCR(bool devID, uint16_t count);
 
 uint32_t NAFE113x8_getSample(uint16_t index);
 float NAFE113x8_VoltageTranslation(uint32_t value, uint8_t input , bool dataOut16, float gain);

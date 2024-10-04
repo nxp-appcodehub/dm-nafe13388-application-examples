@@ -1,6 +1,5 @@
 /*
- * Copyright 2016-2024 NXP
- * All rights reserved.
+ * Copyright 2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,6 +15,7 @@
 #include "clock_config.h"
 #include "MCXN947_cm33_core0.h"
 #include "fsl_debug_console.h"
+#include "systick_utils.h"
 #include "NAFE113x8_SDK.h"
 /* TODO: insert other include files here. */
 
@@ -24,7 +24,7 @@ static void waitReady();
 static void doGpiosBlink();
 
 static void delay(uint32_t ms);
-static void loadCellWeightScale();
+static uint8_t loadCellWeightScale();
 /*
  * @brief   Application entry point.
  */
@@ -34,6 +34,7 @@ int main(void) {
 	/* Init board hardware. */
 	BOARD_InitBootPins();
 	BOARD_InitBootClocks();
+	BOARD_SystickEnable();
 	BOARD_InitBootPeripherals();
 #ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
 	/* Init FSL debug console. */
@@ -70,7 +71,7 @@ int main(void) {
 	return 0 ;
 }
 
-static void loadCellWeightScale(){
+static uint8_t loadCellWeightScale(){
 
 	int knownWeight;
 	char key;
@@ -80,6 +81,7 @@ static void loadCellWeightScale(){
 	float coefficient;
 	float weight;
 	bool confirmation = true;
+	int status;
 
 	// Ch0 Force/Sense Configuration
 	NAFE113x8_WriteCommand(CMD_CH0,0); // Set Pointer to ch0
@@ -113,7 +115,9 @@ static void loadCellWeightScale(){
 	PRINTF("\r\nLeave the weight scale without weight and click any buttons. \r\n");
 	GETCHAR(); // Wait a keyboard import to start a conversion sequence.
 
-	NAFE113x8_doSCCR(0,0,50);
+	status = NAFE113x8_doSCCR(0,0,50);
+	if(status)
+		return TIMEOUT;
 
 	PRINTF("\r\nPress any key to start conversion\r\n");
 	GETCHAR();
@@ -141,7 +145,9 @@ static void loadCellWeightScale(){
 	}
 
 	NAFE113x8_WriteCommand(CMD_CH0,0);
-	NAFE113x8_doSCCR(0,0,50);
+	status = NAFE113x8_doSCCR(0,0,50);
+	if(status)
+		return TIMEOUT;
 	voltage = 0;
 	for(int i = 0; i<50; i++){
 		voltage += NAFE113x8_VoltageTranslation(NAFE113x8_getSample(i),HV,0,16);
@@ -159,7 +165,9 @@ static void loadCellWeightScale(){
 		GETCHAR(); // Wait a keyboard import to start a conversion sequence.
 
 		NAFE113x8_WriteCommand(CMD_CH0,0);
-		NAFE113x8_doSCCR(0,0,50);
+		status = NAFE113x8_doSCCR(0,0,50);
+		if(status)
+			return TIMEOUT;
 		voltage = 0; // Initialize result variable
 		for(int i = 0; i<50; i++){
 			voltage += NAFE113x8_VoltageTranslation(NAFE113x8_getSample(i),HV,0,16);

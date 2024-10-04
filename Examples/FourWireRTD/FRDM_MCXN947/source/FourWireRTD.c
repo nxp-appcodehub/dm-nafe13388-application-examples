@@ -1,6 +1,5 @@
 /*
- * Copyright 2016-2024 NXP
- * All rights reserved.
+ * Copyright 2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,6 +15,7 @@
 #include "clock_config.h"
 #include "MCXN947_cm33_core0.h"
 #include "fsl_debug_console.h"
+#include "systick_utils.h"
 #include "NAFE113x8_SDK.h"
 /* TODO: insert other include files here. */
 
@@ -23,7 +23,7 @@
 static void waitReady();
 static void doGpiosBlink();
 static void delay(uint32_t ms);
-static void fourWireRTD();
+static uint8_t fourWireRTD();
 /*
  * @brief   Application entry point.
  */
@@ -33,6 +33,7 @@ int main(void) {
 	/* Init board hardware. */
 	BOARD_InitBootPins();
 	BOARD_InitBootClocks();
+	BOARD_SystickEnable();
 	BOARD_InitBootPeripherals();
 #ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
 	/* Init FSL debug console. */
@@ -58,11 +59,12 @@ int main(void) {
 	return 0 ;
 }
 
-static void fourWireRTD(){
+static uint8_t fourWireRTD(){
 
 	const float R0=100;
 	const float A=0.003908;
 	const float ISource=0.000765;
+	int status;
 
 	float voltage;
 	float voltageSum;
@@ -95,7 +97,9 @@ static void fourWireRTD(){
 	NAFE113x8_WriteField(&ChConfig3_ViexAin,0,0);
 	NAFE113x8_WriteField(&ChConfig3_ViexChop,0,0);
 
-	NAFE113x8_doSCCR(0,0,20);
+	status = NAFE113x8_doSCCR(0,0,20);
+	if(status)
+		return TIMEOUT;
 
 	PRINTF("\r\nPress any key to start conversion\r\n");
 	GETCHAR();
@@ -118,6 +122,7 @@ static void fourWireRTD(){
 	PRINTF("\r\n------------Average Conversion-------------");
 	PRINTF("\r\n\033[32mVoltage RTD=%6fV, Temperature RTD=%3fC\033[37m", voltage,temperatureResult);
 	PRINTF("\r\n---------------------------\r\n");
+	return 0;
 }
 
 static void waitReady(){

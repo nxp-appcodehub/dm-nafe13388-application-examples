@@ -5,7 +5,7 @@
  * @date     10. January 2018
  ******************************************************************************/
 /*
- * Copyright (c) 2017-2018 Arm Limited. All rights reserved.
+ * Copyright (c) 2017-2018 Arm Limited. 
  *
  * SPDX-License-Identifier: Apache-2.0
  *

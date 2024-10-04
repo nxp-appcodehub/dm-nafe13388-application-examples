@@ -1,6 +1,5 @@
 /*
- * Copyright 2016-2024 NXP
- * All rights reserved.
+ * Copyright 2024 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -16,6 +15,7 @@
 #include "clock_config.h"
 #include "MCXN947_cm33_core0.h"
 #include "fsl_debug_console.h"
+#include "systick_utils.h"
 #include "NAFE113x8_SDK.h"
 /* TODO: insert other include files here. */
 
@@ -35,6 +35,7 @@ int main(void) {
     /* Init board hardware. */
     BOARD_InitBootPins();
     BOARD_InitBootClocks();
+    BOARD_SystickEnable();
     BOARD_InitBootPeripherals();
 #ifndef BOARD_INIT_DEBUG_CONSOLE_PERIPHERAL
     /* Init FSL debug console. */
