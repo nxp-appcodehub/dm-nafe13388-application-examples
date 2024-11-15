@@ -6,8 +6,8 @@
 
 - Voltage sensing (SCSR,MCMR)
 - Current sensing
-- Two-wire RTD
-- Four-wire RTD
+- 2-wire RTD
+- 4-wire RTD
 - Weight scale (load cell) 
 
 ## Table of Contents
@@ -17,9 +17,9 @@
    3.1 [Voltage Sensing SCSR](#voltage-sensing-scsr)<br>
    3.2 [Voltage Sensing MCMR](#voltage-sensing-mcmr)<br>
    3.3 [Current Sensing SCSR](#current-sensing-scsr)<br>
-   3.4 [Two Wire RTD SCCR](#two-wire-rtd-sccr)<br>
-   3.5 [Four Wire RTD SCCR](#four-wire-rtd-sccr)<br>
-   3.6 [Weight Scale SCCR](#weight-scale-sccr)<br>
+   3.4 [2-wire RTD SCCR](#2-wire-rtd-sccr)<br>
+   3.5 [4-wire RTD SCCR](#4-wire-rtd-sccr)<br>
+   3.6 [Weight scale SCCR](#weight-scale-sccr)<br>
 
 ## 1. Software<a name="software"></a>
 - [IoT Sensing SDK (ISSDK) v1.8](https://nxp.com/iot-sensing-sdk) offered as middleware in MCUXpresso SDK for supported platforms
@@ -173,7 +173,7 @@
 
     [<img src="./../images/CurrentSensing_SCSR.PNG" width="700"/>](CurrentSensing_SCSR.PNG)
 
-#### 3.4 Two wire RTD SCCR <a name="two-wire-rtd-sccr"></a>
+#### 3.4 2-wire RTD SCCR <a name="2-wire-rtd-sccr"></a>
 
 - Reading voltage across two wire RTD powered by NAFE13388 VIEX using single channel continuous reading conversion.
 - RTD stands for resistance temperature detectors.
@@ -216,7 +216,7 @@
 - **Note:** A 3-wire RTD is better than a 2-wire RTD because it compensates for the resistance of the connecting wires, improving measurement accuracy by canceling out the effects of lead wire resistance, especially in longer distances.
 
 - **Note**: Since the NAFE13388 silicon doesn't provide the support to excite two analog inputs pins from single excitation pin as needed so we will not show the use case of three wire RTDs and directly proceed with four wire RTDs.
-#### 3.5 Four wire RTD SCCR <a name="four-wire-rtd-sccr"></a>
+#### 3.5 4-wire RTD SCCR <a name="4-wire-rtd-sccr"></a>
 
 - Reading voltage across four wire RTD powered by NAFE13388 VIEX using single channel continuous reading conversion.
 
