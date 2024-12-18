@@ -1,0 +1,10 @@
+/board/
+/component/
+/device/
+/drivers/
+/gpio_driver/
+/interfaces/
+/rtc/
+/source/
+/startup/
+/utilities/

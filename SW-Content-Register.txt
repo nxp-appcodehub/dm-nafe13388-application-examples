@@ -1,12 +1,11 @@
 NXP Software Content Register
  
 Release Name: dm-nafe13388-application-examples
-Release Version: 2.0
+Release Version: 3.0
 Package License: BSD-3-Clause
 Package License File: License.txt
-Description: This contains cli and gui based examples for different applications of NAFE13388-UIM for FRDM-MCXN947.
-Distribution Type: Application Code hub
+Description: This contains cli (cmsis based and non_cmsis based) and gui based examples for different applications of NAFE13388-UIM for FRDM-MCXN947.
 Release Location: https://github.com/nxp-appcodehub/dm-nafe13388-application-examples
 Origin: NXP (BSD-3-Clause)
-           ARM CMSIS 5.4.0 (Apache-2.0) - https://github.com/ARM-software/CMSIS_5/releases/tag/5.4.0 
+           ARM CMSIS 5.8.0 (Apache-2.0) - https://github.com/ARM-software/CMSIS_5/releases/tag/5.8.0 
 						   

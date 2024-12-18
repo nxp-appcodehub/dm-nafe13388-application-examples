@@ -135,9 +135,15 @@ Below are the links for CLI applications README and GUI applications README cont
 
 ### 2.1 Command line interface <a name="command-line-interface"></a>
 
-For command line applications, documentation and steps refer README_CLI.md
+For Non-CMSIS based command line applications, documentation and steps refer README_CLI.md
 
-- [CLI README](./examples_CLI/README_CLI.md)
+- [CLI README (Non-CMSIS)](./examples_CLI/README_CLI.md)
+
+For CMSIS based command line applications, documentation and steps refer README_CLI.md
+
+- [CLI README (CMSIS)](./examples_CLI_CMSIS/README_CLI.md)
+
+Note: CLI README remains same for both the applications as command line interface is same for both CMSIS and non CMSIS compliant applications.
 
 ### 2.2 Graphical user interface <a name="graphical-user-interface"></a>
 
@@ -187,3 +193,4 @@ Questions regarding the content/correctness of this example can be entered as is
 | 1.0     | Initial release on Application Code Hub        | September 28<sup>th</sup> 2024 |
 | 1.1     | Updated Image for Voltage Sensing (SCSR,MCMR)  | October 21<sup>th</sup> 2024 |
 | 2.0     | Added GUI based application to run different scenarios of NAFE13388  | October 25<sup>th</sup> 2024 |
+| 3.0     | In GUI, Added Calibration Tab, On-Board RTD in applications tab. In CLI, Added CMSIS compliant SDK and applications | December 18<sup>th</sup> 2024 |

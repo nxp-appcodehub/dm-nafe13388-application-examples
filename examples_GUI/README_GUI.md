@@ -63,7 +63,7 @@
         
 - **Read/Write method:** User can read/write register fields by right clicking on any particular drop down box in the GUI.
 
-    [<img src="./../images/Key-Feature.png" width="700"/>](Kye-Feature.png)
+     [<img src="./../images/Key-Feature.png" width="700"/>](Kye-Feature.png)
  
 - **Channel configuration menu:** At the right side of the main configuration tab, this menu is used to perform conversion/reading operations like SCSR, MCMR, SCCR, MCCR.
 - **GPIOs Configuration:** 
@@ -75,10 +75,12 @@
         4) Clock selection: Internal, External, or Crystal.
         5) Data ready signal behavior: Asserted on every channel in sequence or Asserted on end of sequence.
   
-        [<img src="./../images/Gpio_Config.png" width="700"/>](Gpio_Config.png)
+     [<img src="./../images/Gpio_Config.png" width="700"/>](Gpio_Config.png)
 
     - The NAFE13388 has ten GPIOs, manageable from the GUI, in Output and Input modes as seen in the below image.
-        [<img src="./../images/Gpio_Array.png" width="700"/>](Kye-Feature.png)
+  
+     [<img src="./../images/Gpio_Array.png" width="700"/>](Kye-Feature.png)
+
     - The bits that can be accessed from this matrix are:
         - Pin Connect: Should be enabled to use the connected pins as GPIOs.
         - GPI/GPO Enable: Depending on the desired functionality, GPI/GPO must be enabled.
@@ -86,14 +88,17 @@
         - GPI State: Click the Read button to update the cell states of the GPIOs set as Input.
     - GPIO Testing:
         - Configure Gpio 2,4 and 7 as output and set the GPO state cell(tick means it is set to High) and click on "Write" button, then observe the led status change accordingly.
-         [<img src="./../images/Gpio_Test.png"  width="700"/>](Gpio_test.png)
+         
+        [<img src="./../images/Gpio_Test.png"  width="700"/>](Gpio_test.png)
+
         - Result:
-  
-          [<img src="./../images/Gpio_HW.jpeg" width="400"/>](Gpio_HW.jpeg)
+
+        [<img src="./../images/Gpio_HW.jpeg" width="700"/>](Gpio_HW.jpeg)
         
 - **Calibration:** 
     - This tab is used to perform the calibration of the device and write the particular Gain/Offset registers.
-        [<img src="./../images/Cal_Tab.png" width="700"/>](Cal_Tab.png)
+     
+     [<img src="./../images/Cal_Tab.png" width="700"/>](Cal_Tab.png)
 
     - **Steps to perform calibration**:
       - To perform calibration select the type of input required from the Input drop-down box as shown in the image above:
@@ -103,17 +108,23 @@
       - After selecting the input, choose the required pins from PGAOP and PGAON drop down box, and set the gain value. Then, select the appropriate Coefficient Pair to use.
       - Next, apply the required voltage to the specified pins as indicated in the text box. Measure the voltage with a multimeter and enter the value into the DMM Sample box. Click the "Start Conversion" button to obtain the NAFE Sample value.
       - After that, click the "Perform Calibration" button to begin the calibration process.
-      - You can check the register mapping on CH15 in the register map, as well as the updated values for the coefficient pair (Gain and Offset registers) in the system register menu under the register map tab.
+      - User can check the register mapping on CH15 in the register map, as well as the updated values for the coefficient pair (Gain and Offset registers) in the system register menu under the register map tab.
     - **For example**: 
-      - After performing calibration for the **Differential Input** case using the pins AI1P and AI2N with a gain of 0.4x and Coefficient Pair 0:
-      - Apply -10V between AI1P and AI2N, measure the voltage with a multimeter as seen in the image below, and enter the value into the DMM Sample(x1) box.
-           [<img src="./../images/Cal_N.jpeg" width="700"/>](Cal_N.jpeg)
+      - After performing calibration for the **Differential Input** case using the pins AI1P and AI2N with a gain of 0.8x and Coefficient Pair 0:
+      - Apply -5V between AI1P and AI2N, measure the voltage with a multimeter as seen in the image below, and enter the value into the DMM Sample(x1) box.
+        
+        [<img src="./../images/Cal_N.jpg" width="700"/>](Cal_N.jpg)
+
       - Then, click "Start Conversion" to obtain the NAFE Sample value(y1).
-      - Next, apply +10V between AI1P and AI2N, measure the voltage with a multimeter as seen in the image below, and enter the value into the DMM Sample(x2) box .
-            [<img src="./../images/Cal_P.jpeg" width="700"/>](Cal_P.jpeg)
+      - Next, apply +5V between AI1P and AI2N, measure the voltage with a multimeter as seen in the image below, and enter the value into the DMM Sample(x2) box .
+            
+        [<img src="./../images/Cal_P.jpeg" width="700"/>](Cal_P.jpeg)
+
       - Click "Start Conversion" to obtain the NAFE Sample(y2), and then click on "Perform Calibration" to save the selected Coefficient Pair.
-            [<img src="./../images/Cal_Tested.png" width="700"/>](Cal_Tested.png) 
-      - You can see the updated Gain and Offset values as per the calibration in the image above.
+            
+        [<img src="./../images/Cal_Tested.png" width="700" align="center"/>](Cal_Tested.png)
+         
+      - The updated Gain and Offset values as per the calibration in the image above.
 
 - **Register map:** This tab is used to read and write all of the registers.
 - **Applications:** This tab is used to test different applications of the AFE, such as current sensing, 2/4-wire resistance temperature detector (RTD), weight scale, and so on.
@@ -606,8 +617,11 @@ or press "Continuous Conversion" button to plot graph according to the continuou
     - Use [on_board_rtd.json](./import_export_test_json/on_board_rtd.json) to import register and channel settings for SCCR conversion and then press the Write All button of both the channel registers and system registers to write all the registers at once.
 - Connect external voltage source to J89, with the GND connecetd to pin 1 and +15V connected to pin 2 of J89.
 - Hardware Connections:
+  
      [<img src="./../images/ORTD_Setup.jpeg" width="700"/>](ORTD_Setup.jpeg)
+
 - Result:
+  
     [<img src="./../images/On_Board_RTD.png" width="700"/>](On_Board_RTD.png)
       
     
