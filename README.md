@@ -147,9 +147,13 @@ Note: CLI README remains same for both the applications as command line interfac
 
 ### 2.2 Graphical user interface <a name="graphical-user-interface"></a>
 
-For GUI applications, documentation and steps refer README_CLI.md
+For Non-CMSIS based GUI applications, documentation and steps refer README_GUI.md
 
-- [GUI README](./examples_GUI/README_GUI.md)
+- [GUI README (Non-CMSIS)](./examples_GUI/README_GUI.md)
+
+For CMSIS based GUI applications, documentation and steps refer README_GUI_CMSIS.md
+
+- [GUI README (CMSIS)](./examples_GUI_CMSIS/README_GUI_CMSIS.md)
 
 ## 3. FAQs<a name="faqs)"></a>
 No FAQs have been identified for this project.
@@ -194,3 +198,4 @@ Questions regarding the content/correctness of this example can be entered as is
 | 1.1     | Updated Image for Voltage Sensing (SCSR,MCMR)  | October 21<sup>th</sup> 2024 |
 | 2.0     | Added GUI based application to run different scenarios of NAFE13388  | October 25<sup>th</sup> 2024 |
 | 3.0     | In GUI, Added Calibration Tab, On-Board RTD in applications tab. In CLI, Added CMSIS compliant SDK and applications | December 18<sup>th</sup> 2024 |
+| 4.0     | In GUI, Added Firmware flashing support and in Firmware, added CMSIS compliant support | April 21<sup>st</sup> 2025 |

@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 NXP
+ * Copyright 2025 NXP
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -287,7 +287,6 @@ static uint8_t NAFE113x8_CountChannelsEnabled(){
 static uint16_t NAFE113x8_CaptureSamplesSCCR(uint16_t count){
 	uint16_t sampleCount = 0;
 	while (sampleCount <count){
-		NAFE113x8_DELAY_ms(1000);//LP
 		if(SampleReceived){
 			SampleReceived=false;
 		if(sampleCount%2==0)
@@ -317,7 +316,6 @@ static uint16_t NAFE113x8_CaptureSamplesMCMR(uint16_t activeChannelCount, bool d
 static uint16_t NAFE113x8_CaptureSamplesMCCR(uint16_t activeChannelCount, bool dataOut16, bool statusByteEn, uint16_t count){
 	uint16_t sampleCount = 0;
 	while (sampleCount <count){
-		NAFE113x8_DELAY_ms(1000);//LP
 		if (SampleReceived){
 			SampleReceived=false;
 			for (int i=0; i<activeChannelCount;i++) {
