@@ -12,7 +12,7 @@
 static void NAFE_Init();
 nafe13388_sensorhandle_t nafeDriver;
 char buf_read_write[1024];
-uint32_t samplesBuffer[2048*16];
+uint32_t samplesBuffer[100*16];
 /*
  * NAFE Parser
  */
@@ -46,6 +46,8 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 				/*
 				 * Request to initialize MCU SPI and GPIOs to comunicate with NAFE113x8
 				 */
+
+				free(vcom_msg->imsg);
 				vcom_msg->isize = 0;
 
 				NAFE_Init();
@@ -71,6 +73,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 				 */
 				Address = ((vcom_msg->imsg[1])<<8) | ((vcom_msg->imsg[2]));
 				length = vcom_msg->imsg[3];
+				free(vcom_msg->imsg);
 	            vcom_msg->isize = 0;
 
 				NAFE13388_Read(&nafeDriver, Address, output, length);
@@ -115,6 +118,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 					buf[1] = vcom_msg->imsg[6];
 				}
 
+				free(vcom_msg->imsg);
 				vcom_msg->isize = 0;
 
 				NAFE13388_Write(&nafeDriver, Address, buf, length);
@@ -143,6 +147,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 				 */
 				uint8_t commandID = vcom_msg->imsg[1];
 				bool devID = vcom_msg->imsg[2];
+				free(vcom_msg->imsg);
 				vcom_msg->isize = 0;
 
 				NAFE13388_CommandWrite(&nafeDriver, commandID);
@@ -167,6 +172,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 
 					devID = vcom_msg->imsg[1];
 					channel = vcom_msg->imsg[2];
+					free(vcom_msg->imsg);
 					vcom_msg->isize = 0;
 
 					Address = 0x40 + (channel);
@@ -176,6 +182,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 					clearReceivedFlag();
 					NAFE13388_CommandWrite(&nafeDriver ,CMD_SS);
 					while(!getReceivedFlag());
+					delay(10);
 					NAFE13388_Read(&nafeDriver, Address, output, length);
 
 					value = (output[0] << 16) | (output[1] << 8) | (output[2]);
@@ -206,7 +213,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 					devID = vcom_msg->imsg[1];
 					channel = vcom_msg->imsg[2];
 					count = (vcom_msg->imsg[4])<<8  | (vcom_msg->imsg[3]);
-					//
+					free(vcom_msg->imsg);
 					vcom_msg->isize = 0;
 
 					Address = 0x40 + (channel);
@@ -218,6 +225,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 						clearReceivedFlag();
 						NAFE13388_CommandWrite(&nafeDriver ,CMD_SC);
 						while(!getReceivedFlag());
+						delay(10);
 						NAFE13388_Read(&nafeDriver, Address, output, length);
 
 						samplesBuffer[i] = (output[0] << 16) | (output[1] << 8) | (output[2]);
@@ -248,7 +256,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 					 */
 
 					devID = vcom_msg->imsg[1];
-					//
+					free(vcom_msg->imsg);
 					vcom_msg->isize = 0;
 
 					NAFE13388_Read(&nafeDriver, NAFE13388_CH_CONFIG4, active, 2);
@@ -307,6 +315,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 
 					devID = vcom_msg->imsg[1];
 					count = (vcom_msg->imsg[3])<<8  | (vcom_msg->imsg[2]);
+					free(vcom_msg->imsg);
 					vcom_msg->isize = 0;
 
 					NAFE13388_Read(&nafeDriver, NAFE13388_CH_CONFIG4, active, 2);
@@ -366,6 +375,7 @@ void NAFE113x8_Handling(parse_vcom_t *vcom_msg){
 			bit16 = vcom_msg->imsg[1];
 			offset = (vcom_msg->imsg[3])<<8  | (vcom_msg->imsg[2]);
 			count = (vcom_msg->imsg[5])<<8  | (vcom_msg->imsg[4]);
+			free(vcom_msg->imsg);
 			vcom_msg->isize = 0;
 
 			if (bit16 == 0)

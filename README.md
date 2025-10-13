@@ -199,3 +199,4 @@ Questions regarding the content/correctness of this example can be entered as is
 | 2.0     | Added GUI based application to run different scenarios of NAFE13388  | October 25<sup>th</sup> 2024 |
 | 3.0     | In GUI, Added Calibration Tab, On-Board RTD in applications tab. In CLI, Added CMSIS compliant SDK and applications | December 18<sup>th</sup> 2024 |
 | 4.0     | In GUI, Added Firmware flashing support and in Firmware, added CMSIS compliant support | April 21<sup>st</sup> 2025 |
+| 5.0     | Fixed bugs and provided enhancements  | October 15<sup>th</sup> 2025 |
